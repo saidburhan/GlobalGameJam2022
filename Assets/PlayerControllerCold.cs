@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerControllerCold : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class PlayerControllerCold : MonoBehaviour
 	private float speed = 5;
 	private float jumpHeight = 2;
 	public bool isAvailable;
+	public Slider slider;
+	public int toplanan;
+	public GameObject playerHot;
 
 	private void Awake()
 	{
@@ -57,5 +61,32 @@ public class PlayerControllerCold : MonoBehaviour
 			characterController.Move(velocity * Time.deltaTime);
 		}
 		
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("b5"))
+		{
+			toplanan += 5;
+			Destroy(other.gameObject);
+		}
+		else if (other.CompareTag("b10"))
+		{
+			toplanan += 10;
+		}
+		else if (other.CompareTag("b20"))
+		{
+			toplanan += 20;
+		}
+
+	}
+
+	public IEnumerator SliderActive()
+	{
+		while (isAvailable)
+		{
+			slider.value = slider.value + 0.0018f;
+			yield return new WaitForSeconds(0.035f);
+		}
 	}
 }

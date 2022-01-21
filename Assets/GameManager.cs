@@ -4,11 +4,21 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    
+
+	public static GameManager instance;
+	public int score;
 
 
-    // Update is called once per frame
-    void Update()
+	private void Awake()
+	{
+		if (instance == null) instance = this;
+		else Destroy(this);
+	}
+
+
+
+	// Update is called once per frame
+	void Update()
     {
 		if (Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.H))
 		{
@@ -16,11 +26,15 @@ public class GameManager : MonoBehaviour
 			{
                 PlayerControllerCold.instance.isAvailable = false;
                 PlayerControllerHot.instance.isAvailable = true;
+				StartCoroutine(PlayerControllerHot.instance.SliderActive());
+				
 			}
 			else
 			{
                 PlayerControllerHot.instance.isAvailable = false;
                 PlayerControllerCold.instance.isAvailable = true;
+				StartCoroutine(PlayerControllerCold.instance.SliderActive());
+				PlayerControllerHot.instance.HotToCold();
 			}
 		}
     }

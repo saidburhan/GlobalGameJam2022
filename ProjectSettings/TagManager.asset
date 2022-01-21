@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Ates
+  - a5
+  - a10
+  - a20
+  - b5
+  - b10
+  - b20
   layers:
   - Default
   - TransparentFX
