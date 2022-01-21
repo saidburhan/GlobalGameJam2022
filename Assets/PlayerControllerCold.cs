@@ -68,18 +68,52 @@ public class PlayerControllerCold : MonoBehaviour
 		if (other.CompareTag("b5"))
 		{
 			toplanan += 5;
-			Destroy(other.gameObject);
+			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("b10"))
 		{
 			toplanan += 10;
+			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("b20"))
 		{
 			toplanan += 20;
+			other.GetComponent<Collider>().enabled = false;
+		}
+		else if (other.CompareTag("a5"))
+		{
+			DecreaseSliderValue(5);
+			Destroy(other.gameObject);
+		}
+		else if (other.CompareTag("a10"))
+		{
+			DecreaseSliderValue(10);
+			Destroy(other.gameObject);
+		}
+		else if (other.CompareTag("a20"))
+		{
+			DecreaseSliderValue(20);
+			Destroy(other.gameObject);
 		}
 
 	}
+
+
+	public void DecreaseSliderValue(int gelen)
+	{
+		float value = (float)gelen / 100;
+		if (value <= slider.value)
+		{
+			slider.value = slider.value - value;
+		}
+		else
+		{
+			slider.value = 0;
+		}
+		GameManager.instance.score += toplanan;
+		toplanan = 0;
+	}
+
 
 	public IEnumerator SliderActive()
 	{

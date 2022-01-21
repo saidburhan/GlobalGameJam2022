@@ -69,17 +69,53 @@ public class PlayerControllerHot : MonoBehaviour
 		if (other.CompareTag("a5"))
 		{
 			toplanan += 5;
-			Destroy(other.gameObject);
+			GameManager.instance.toplananlar.Add(other.gameObject);
+			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("a10"))
 		{
 			toplanan += 10;
+			GameManager.instance.toplananlar.Add(other.gameObject);
+			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("a20"))
 		{
 			toplanan += 20;
+			GameManager.instance.toplananlar.Add(other.gameObject);
+			other.GetComponent<Collider>().enabled = false;
 		}
-		Debug.Log("ateþ toplamý " + toplanan);
+		else if (other.CompareTag("b5"))
+		{
+			DecreaseSliderValue(5);
+			Destroy(other.gameObject);
+		}
+		else if (other.CompareTag("b10"))
+		{
+			DecreaseSliderValue(10);
+			Destroy(other.gameObject);
+		}
+		else if (other.CompareTag("b20"))
+		{
+			DecreaseSliderValue(20);
+			Destroy(other.gameObject);
+		}
+
+	}
+
+	public void DecreaseSliderValue(int gelen)
+	{
+		float value = (float)gelen / 100;
+		if (value <= PlayerControllerCold.instance.slider.value)
+		{
+			
+			slider.value = slider.value - value;
+		}
+		else
+		{
+			slider.value = 0;
+		}
+		GameManager.instance.score += toplanan;
+		toplanan = 0;
 	}
 
 	public void PlayerHotStartingEvent()
@@ -92,7 +128,7 @@ public class PlayerControllerHot : MonoBehaviour
 	{
 		while (isAvailable)
 		{
-			slider.value = slider.value + 0.0018f;
+			slider.value +=  0.0018f;
 			yield return new WaitForSeconds(0.035f);
 		}
 	}
