@@ -34,6 +34,7 @@ public class PlayerControllerCold : MonoBehaviour
 
 	private void Update()
 	{
+		Debug.Log(isGrounded);
 		if (isAvailable)
 		{
 			horizontalInput = Input.GetAxis("Horizontal"); ;
@@ -55,9 +56,10 @@ public class PlayerControllerCold : MonoBehaviour
 
 			characterController.Move(new Vector3(horizontalInput * 5, 0, 0) * Time.deltaTime);
 
-			if (isGrounded && Input.GetButtonDown("Jump"))
+			if (isGrounded)
 			{
-				velocity.y += Mathf.Sqrt(jumpHeight * -2 * gravity);
+				if (Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.Joystick1Button0))
+					velocity.y += Mathf.Sqrt(jumpHeight * -2 * gravity);
 			}
 
 			characterController.Move(velocity * Time.deltaTime);
@@ -127,12 +129,12 @@ public class PlayerControllerCold : MonoBehaviour
 		{
 			slider.value = slider.value + 0.0018f;
 			yield return new WaitForSeconds(0.035f);
-			if (slider.value >= 1)
-			{
-				// Oyun sonu iþlemleri...
-				GameManager.instance.GameOver();
-				isAvailable = false;
-			}
+			//if (slider.value >= 1)
+			//{
+			//	// Oyun sonu iþlemleri...
+			//	GameManager.instance.GameOver();
+			//	isAvailable = false;
+			//}
 		}
 	}
 }

@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		if (Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.H))
+		if (Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftControl)  || Input.GetKeyDown(KeyCode.Joystick1Button5))
 		{
 			if(toplananlar.Count > 0)
 			{
