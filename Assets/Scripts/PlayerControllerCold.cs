@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class PlayerControllerCold : MonoBehaviour
 {
 	public static PlayerControllerCold instance;
@@ -17,7 +18,8 @@ public class PlayerControllerCold : MonoBehaviour
 	public bool isAvailable;
 	public Slider slider;
 	public int toplanan;
-	public GameObject playerHot;
+	public GameObject playerModel;
+
 
 	private void Awake()
 	{
@@ -37,7 +39,7 @@ public class PlayerControllerCold : MonoBehaviour
 			horizontalInput = Input.GetAxis("Horizontal"); ;
 
 			// face forward
-			transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
+			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
 
 
 			isGrounded = Physics.CheckSphere(transform.position, .1f, groundLayers, QueryTriggerInteraction.Ignore);
@@ -68,16 +70,19 @@ public class PlayerControllerCold : MonoBehaviour
 		if (other.CompareTag("b5"))
 		{
 			toplanan += 5;
+			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("b10"))
 		{
 			toplanan += 10;
+			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("b20"))
 		{
 			toplanan += 20;
+			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
 		}
 		else if (other.CompareTag("a5"))
@@ -110,7 +115,8 @@ public class PlayerControllerCold : MonoBehaviour
 		{
 			slider.value = 0;
 		}
-		GameManager.instance.score += toplanan;
+		GameManager.instance.score += gelen;
+		UiController.instance.SetGPScoreText();
 		toplanan = 0;
 	}
 
@@ -121,6 +127,12 @@ public class PlayerControllerCold : MonoBehaviour
 		{
 			slider.value = slider.value + 0.0018f;
 			yield return new WaitForSeconds(0.035f);
+			if (slider.value >= 1)
+			{
+				// Oyun sonu iþlemleri...
+				GameManager.instance.GameOver();
+				isAvailable = false;
+			}
 		}
 	}
 }

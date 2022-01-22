@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
 
 	public static GameManager instance;
 	public List<GameObject> toplananlar = new List<GameObject>();
+	public List<Vector3> olusturmaPozisyonlari = new List<Vector3>();
+	public List<GameObject> toplananPrefablar = new List<GameObject>();
 	public int score;
 	public AnimationCurve curve;
+	public bool isContinue;
 
 
 	private void Awake()
@@ -20,8 +22,8 @@ public class GameManager : MonoBehaviour
 
 	private void Start()
 	{
-		DOTween.Init();
-		curve = new AnimationCurve();
+		isContinue = true;
+		StartCoroutine(CreateFireOrIce());
 	}
 
 
@@ -42,6 +44,10 @@ public class GameManager : MonoBehaviour
 		}
     }
 
+	public void GameOver()
+	{
+
+	}
 
 	//public void ToplananlariGonder(GameObject obj)
 	//{
@@ -119,7 +125,27 @@ public class GameManager : MonoBehaviour
 			PlayerControllerHot.instance.isAvailable = false;
 			PlayerControllerCold.instance.isAvailable = true;
 			StartCoroutine(PlayerControllerCold.instance.SliderActive());
-			//PlayerControllerHot.instance.HotToCold();
+		}
+	}
+
+	public IEnumerator CreateFireOrIce()
+	{	
+		while (isContinue)
+		{
+			if (PlayerControllerHot.instance.isAvailable)
+			{
+				int rnd = Random.Range(0, 5); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
+				int rnd2 = Random.Range(0,3); // 6 prefabýn ilk üçü buna ait olacaðý için..
+				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
+				yield return new WaitForSeconds(2);
+			}
+			else
+			{
+				int rnd = Random.Range(5, 10); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
+				int rnd2 = Random.Range(3, 6); // 6 prefabýn ilk üçü buna ait olacaðý için..
+				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
+				yield return new WaitForSeconds(2);
+			}
 		}
 	}
 

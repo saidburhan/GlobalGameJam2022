@@ -17,7 +17,7 @@ public class PlayerControllerHot : MonoBehaviour
 	public bool isAvailable;
 	public Slider slider;
 	public int toplanan;
-	public GameObject playerCold;
+	public GameObject playerModel;
 
 	private void Awake()
 	{
@@ -38,7 +38,7 @@ public class PlayerControllerHot : MonoBehaviour
 			horizontalInput = Input.GetAxis("Horizontal"); ;
 
 			// face forward
-			transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
+			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
 
 
 			isGrounded = Physics.CheckSphere(transform.position, .1f, groundLayers, QueryTriggerInteraction.Ignore);
@@ -115,6 +115,7 @@ public class PlayerControllerHot : MonoBehaviour
 			slider.value = 0;
 		}
 		GameManager.instance.score += toplanan;
+		UiController.instance.SetGPScoreText();
 		toplanan = 0;
 	}
 
@@ -130,6 +131,12 @@ public class PlayerControllerHot : MonoBehaviour
 		{
 			slider.value +=  0.0018f;
 			yield return new WaitForSeconds(0.035f);
+			if(slider.value >= 1)
+			{
+				// Oyun sonu iþlemleri...
+				GameManager.instance.GameOver();
+				isAvailable = false;
+			}
 		}
 	}
 
