@@ -8,8 +8,8 @@ public class UiController : MonoBehaviour
 {
 
     public static UiController instance;
-    //public TextMeshPro gamePlayScoreText;
-    public TMP_Text gamePlayScoreText;
+    public TMP_Text gamePlayScoreText, endPanelScoreText;
+    public GameObject gamePlayPanel, endGamePanel, startPanel;
 
 
     private void Awake()
@@ -19,20 +19,42 @@ public class UiController : MonoBehaviour
     }
 
 
-    // Start is called before the first frame update
+   
     void Start()
     {
-        
+        StartScreenActive();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void SetGPScoreText()
 	{
         gamePlayScoreText.text = GameManager.instance.score.ToString();
 	}
+
+    public void SetEndPanelScore()
+	{
+        endPanelScoreText.text ="SCORE : " + GameManager.instance.score.ToString();
+	}
+
+    public void StartScreenActive()
+	{
+        startPanel.SetActive(true);
+        gamePlayPanel.SetActive(false);
+        endGamePanel.SetActive(false);
+	}
+
+    public void EndPanelActive()
+	{
+        endGamePanel.SetActive(true);
+        startPanel.SetActive(false);
+        gamePlayPanel.SetActive(false);
+        SetEndPanelScore();
+	}
+
+    public void GamePanelActive()
+	{
+        gamePlayPanel.SetActive(true);
+        startPanel.SetActive(false);
+        endGamePanel.SetActive(false);
+    }
 }

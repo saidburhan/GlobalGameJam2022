@@ -13,7 +13,7 @@ public class PlayerControllerCold : MonoBehaviour
 	private Vector3 velocity;
 	private bool isGrounded;
 	private float horizontalInput;
-	private float speed = 5;
+	private float speed = 7;
 	private float jumpHeight = 2;
 	public bool isAvailable;
 	public Slider slider;
@@ -34,7 +34,6 @@ public class PlayerControllerCold : MonoBehaviour
 
 	private void Update()
 	{
-		Debug.Log(isGrounded);
 		if (isAvailable)
 		{
 			horizontalInput = Input.GetAxis("Horizontal"); ;
@@ -43,7 +42,7 @@ public class PlayerControllerCold : MonoBehaviour
 			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
 
 
-			isGrounded = Physics.CheckSphere(transform.position, .1f, groundLayers, QueryTriggerInteraction.Ignore);
+			isGrounded = Physics.CheckSphere(transform.position, .2f, groundLayers, QueryTriggerInteraction.Ignore);
 
 			if (isGrounded && velocity.y < 0)
 			{
@@ -54,7 +53,7 @@ public class PlayerControllerCold : MonoBehaviour
 				velocity.y += gravity * Time.deltaTime;
 			}
 
-			characterController.Move(new Vector3(horizontalInput * 5, 0, 0) * Time.deltaTime);
+			characterController.Move(new Vector3(horizontalInput * speed, 0, 0) * Time.deltaTime);
 
 			if (isGrounded)
 			{
@@ -129,12 +128,12 @@ public class PlayerControllerCold : MonoBehaviour
 		{
 			slider.value = slider.value + 0.0018f;
 			yield return new WaitForSeconds(0.035f);
-			//if (slider.value >= 1)
-			//{
-			//	// Oyun sonu iþlemleri...
-			//	GameManager.instance.GameOver();
-			//	isAvailable = false;
-			//}
+			if (slider.value >= 1)
+			{
+				// Oyun sonu iþlemleri...
+				GameManager.instance.GameOver();
+				isAvailable = false;
+			}
 		}
 	}
 }

@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 	public List<GameObject> toplananPrefablar = new List<GameObject>();
 	public int score;
 	public AnimationCurve curve;
-	public bool isContinue;
+	public bool isContinue, isStartPanel, isEndPanel;
 
 
 	private void Awake()
@@ -22,8 +22,7 @@ public class GameManager : MonoBehaviour
 
 	private void Start()
 	{
-		isContinue = true;
-		StartCoroutine(CreateFireOrIce());
+		StartingEvents();
 	}
 
 
@@ -31,45 +30,86 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		if (Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftControl)  || Input.GetKeyDown(KeyCode.Joystick1Button5))
+		if (isContinue)
 		{
-			if(toplananlar.Count > 0)
+			if (Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.Joystick1Button5))
 			{
-				StartCoroutine(ToplananlariGonder(toplananlar[0]));
+				if (toplananlar.Count > 0)
+				{
+					StartCoroutine(ToplananlariGonder(toplananlar[0]));
+				}
+				else
+				{
+					SetPlayerAvalibility();
+				}
 			}
-			else
-			{
-				SetPlayerAvalibility();
-			}		
 		}
+		else if (isStartPanel)
+		{
+			if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetButtonDown("Jump"))
+			{
+				GameStartEvents();
+			}
+		}
+		else if (isEndPanel)
+		{
+			if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetButtonDown("Jump"))
+			{
+				isContinue = false;
+				UiController.instance.StartScreenActive();
+				isEndPanel = false;
+				isStartPanel = true;
+			}
+		}
+		
     }
 
 	public void GameOver()
 	{
-
+		UiController.instance.EndPanelActive();
+		UiController.instance.SetEndPanelScore();
+		PlayerControllerHot.instance.isAvailable = false;
+		PlayerControllerCold.instance.isAvailable = false;	
+		isEndPanel = true;
+		isContinue = false;
 	}
 
-	//public void ToplananlariGonder(GameObject obj)
-	//{
-	//	if (PlayerControllerCold.instance.isAvailable)
-	//	{
-	//		obj.transform.DOMove(PlayerControllerHot.instance.transform.position, .3f).OnComplete(() =>
-	//		{
-	//			toplananlar.Remove(obj);
-	//			if (toplananlar.Count > 0) ToplananlariGonder(toplananlar[0]);
-	//			else SetPlayerAvalibility();
-	//		});
-	//	}
-	//	else
-	//	{
-	//		obj.transform.DOMove(PlayerControllerCold.instance.transform.position, .3f).OnComplete(() =>
-	//		{
-	//			toplananlar.Remove(obj);
-	//			if (toplananlar.Count > 0) ToplananlariGonder(toplananlar[0]);
-	//			else SetPlayerAvalibility();
-	//		});
-	//	}
-	//}
+	public void GameStartEvents()
+	{
+		score = 0;
+		for (int i = 0; i < toplananlar.Count; i++)
+		{
+			toplananlar.Remove(toplananlar[i]);
+		}
+		PlayerControllerHot.instance.slider.value = 0;
+		PlayerControllerCold.instance.slider.value = .5f;
+		isStartPanel = false;
+		isEndPanel = false;
+		isContinue = true;
+		UiController.instance.GamePanelActive();
+		StartCoroutine(CreateFireOrIce());
+		PlayerControllerHot.instance.PlayerHotStartingEvent();
+		PlayerControllerCold.instance.transform.position = new Vector3(4,-4.9F,-.5F);
+		PlayerControllerHot.instance.transform.position = new Vector3(-4,-4.9F,-.5F);
+		
+	}
+
+
+	public void StartingEvents()
+	{
+		score = 0;
+		for (int i = 0; i < toplananlar.Count; i++)
+		{
+			toplananlar.Remove(toplananlar[i]);
+		}
+		PlayerControllerHot.instance.slider.value = 0;
+		PlayerControllerCold.instance.slider.value = .5f;
+		PlayerControllerCold.instance.isAvailable = false;
+		PlayerControllerHot.instance.isAvailable = false;
+		isContinue = false;
+		isStartPanel = true;
+		isEndPanel = false;
+	}
 
 	public IEnumerator ToplananlariGonder(GameObject obj)
 	{
@@ -80,7 +120,11 @@ public class GameManager : MonoBehaviour
 			toplananlar.Remove(obj);
 			yield return new WaitForSeconds(.2f);
 			if (toplananlar.Count > 0) StartCoroutine(ToplananlariGonder(toplananlar[0]));
-			else SetPlayerAvalibility();
+			else
+			{
+				yield return new WaitForSeconds(.3f);
+				SetPlayerAvalibility();
+			}
 		}
 		else
 		{
@@ -88,7 +132,11 @@ public class GameManager : MonoBehaviour
 			toplananlar.Remove(obj);
 			yield return new WaitForSeconds(.2f);
 			if (toplananlar.Count > 0) StartCoroutine(ToplananlariGonder(toplananlar[0]));
-			else SetPlayerAvalibility();
+			else
+			{
+				yield return new WaitForSeconds(.3f);
+				SetPlayerAvalibility();
+			}
 		}
 	}
 
@@ -104,7 +152,7 @@ public class GameManager : MonoBehaviour
 			aci += 3.6f;
 			pos.y += Mathf.Sin(Mathf.PI/180*aci);
 			obj.transform.position = pos;
-			yield return new WaitForSeconds(.02f);
+			yield return new WaitForSeconds(.01f);
 			if (aci > 180) devam = false;			
 		}
 		obj.GetComponent<Collider>().enabled = true;
@@ -134,14 +182,14 @@ public class GameManager : MonoBehaviour
 		{
 			if (PlayerControllerHot.instance.isAvailable)
 			{
-				int rnd = Random.Range(0, 5); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
+				int rnd = Random.Range(0, 7); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
 				int rnd2 = Random.Range(0,3); // 6 prefabýn ilk üçü buna ait olacaðý için..
 				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
 				yield return new WaitForSeconds(2);
 			}
 			else
 			{
-				int rnd = Random.Range(5, 10); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
+				int rnd = Random.Range(7, 14); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
 				int rnd2 = Random.Range(3, 6); // 6 prefabýn ilk üçü buna ait olacaðý için..
 				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
 				yield return new WaitForSeconds(2);
