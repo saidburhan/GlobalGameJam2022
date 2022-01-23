@@ -40,8 +40,6 @@ public class PlayerControllerHot : MonoBehaviour
 
 			// face forward
 			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);		
-
-			Debug.Log(horizontalInput);
 			if (horizontalInput == 0)
 			{
 				playerAnim.ResetTrigger("run");
@@ -77,23 +75,38 @@ public class PlayerControllerHot : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("a5"))
+		if (other.CompareTag("a5") && isAvailable)
 		{
 			toplanan += 5;
+			UiController.instance.SetEldeki1Text();
 			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
+			other.transform.parent = transform;
+			other.transform.localPosition = new Vector3(0,0.66f,-.2f);
+			other.transform.GetChild(0).gameObject.SetActive(false);
+			other.transform.GetChild(1).gameObject.SetActive(false);
 		}
-		else if (other.CompareTag("a10"))
+		else if (other.CompareTag("a10") && isAvailable)
 		{
 			toplanan += 10;
+			UiController.instance.SetEldeki1Text();
 			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
+			other.transform.parent = transform;
+			other.transform.localPosition = new Vector3(0, 0.66f, -.2f);
+			other.transform.GetChild(0).gameObject.SetActive(false);
+			other.transform.GetChild(1).gameObject.SetActive(false);
 		}
-		else if (other.CompareTag("a20"))
+		else if (other.CompareTag("a20") && isAvailable)
 		{
 			toplanan += 20;
+			UiController.instance.SetEldeki1Text();
 			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
+			other.transform.parent = transform;
+			other.transform.localPosition = new Vector3(0, 0.66f, -.2f);
+			other.transform.GetChild(0).gameObject.SetActive(false);
+			other.transform.GetChild(1).gameObject.SetActive(false);
 		}
 		else if (other.CompareTag("b5"))
 		{
@@ -116,7 +129,7 @@ public class PlayerControllerHot : MonoBehaviour
 	public void DecreaseSliderValue(int gelen)
 	{
 		float value = (float)gelen / 100;
-		if (value <= PlayerControllerCold.instance.slider.value)
+		if (value <= slider.value)
 		{
 			
 			slider.value = slider.value - value;
@@ -125,7 +138,7 @@ public class PlayerControllerHot : MonoBehaviour
 		{
 			slider.value = 0;
 		}
-		GameManager.instance.score += toplanan;
+		GameManager.instance.score += gelen;
 		UiController.instance.SetGPScoreText();
 		toplanan = 0;
 	}
@@ -154,18 +167,4 @@ public class PlayerControllerHot : MonoBehaviour
 		}
 	}
 
-	public void HotToCold()
-	{
-		float value = (float) toplanan / 100;
-		Debug.Log("value" + value);
-		if(value <= PlayerControllerCold.instance.slider.value)
-		{
-			PlayerControllerCold.instance.slider.value = PlayerControllerCold.instance.slider.value - value;
-		}else
-		{
-			PlayerControllerCold.instance.slider.value = 0;
-		}
-		GameManager.instance.score += toplanan;
-		toplanan = 0;
-	}
 }

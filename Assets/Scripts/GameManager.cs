@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 	public int score;
 	public AnimationCurve curve;
 	public bool isContinue, isStartPanel, isEndPanel;
+	public Transform toplananlarParent;
 
 
 	private void Awake()
@@ -30,12 +31,15 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
+		
 		if (isContinue)
 		{
 			if (Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.Joystick1Button5))
 			{
+				
 				if (toplananlar.Count > 0)
 				{
+					SetPlayerAvalibility();
 					StartCoroutine(ToplananlariGonder(toplananlar[0]));
 				}
 				else
@@ -66,20 +70,35 @@ public class GameManager : MonoBehaviour
 
 	public void GameOver()
 	{
+		isContinue = false;
+		PlayerControllerHot.instance.isAvailable = false;
+		PlayerControllerCold.instance.isAvailable = false;
+		PlayerControllerHot.instance.playerAnim.ResetTrigger("run");
+		PlayerControllerCold.instance.playerAnim.ResetTrigger("run");
+		PlayerControllerHot.instance.playerAnim.SetTrigger("idle");
+		PlayerControllerCold.instance.playerAnim.SetTrigger("idle");
 		UiController.instance.EndPanelActive();
 		UiController.instance.SetEndPanelScore();
-		PlayerControllerHot.instance.isAvailable = false;
-		PlayerControllerCold.instance.isAvailable = false;	
-		
+		PlayerControllerHot.instance.toplanan = 0;
+		PlayerControllerCold.instance.toplanan = 0;
+		UiController.instance.SetEldeki1Text();
+		UiController.instance.SetEldeki2Text();
+		for (int i = 0; i < toplananlar.Count; i++)
+		{
+			Destroy(toplananlar[i].gameObject);
+		}
+		toplananlar.Clear();
+		int count = toplananlarParent.childCount;
+		for (int i = 0; i < count; i++)
+		{
+			Destroy(toplananlarParent.GetChild(i).gameObject);
+			count = toplananlarParent.childCount;
+		}
 	}
 
 	public void GameStartEvents()
 	{
 		score = 0;
-		for (int i = 0; i < toplananlar.Count; i++)
-		{
-			toplananlar.Remove(toplananlar[i]);
-		}
 		PlayerControllerHot.instance.slider.value = 0;
 		PlayerControllerCold.instance.slider.value = .5f;
 		isStartPanel = false;
@@ -99,10 +118,6 @@ public class GameManager : MonoBehaviour
 	{
 		AllIdleAnim();
 		score = 0;
-		for (int i = 0; i < toplananlar.Count; i++)
-		{
-			toplananlar.Remove(toplananlar[i]);
-		}
 		PlayerControllerHot.instance.slider.value = 0;
 		PlayerControllerCold.instance.slider.value = .5f;
 		PlayerControllerCold.instance.isAvailable = false;
@@ -115,34 +130,43 @@ public class GameManager : MonoBehaviour
 	public IEnumerator ToplananlariGonder(GameObject obj)
 	{
 
-		if (PlayerControllerCold.instance.isAvailable)
+		if (!PlayerControllerCold.instance.isAvailable)
 		{
-			StartCoroutine(ParabolikHareket(obj, PlayerControllerCold.instance.gameObject, PlayerControllerHot.instance.gameObject));
-			toplananlar.Remove(obj);
-			yield return new WaitForSeconds(.2f);
-			if (toplananlar.Count > 0) StartCoroutine(ToplananlariGonder(toplananlar[0]));
+			if (obj.CompareTag("b5") || obj.CompareTag("b10") || obj.CompareTag("b20"))
+			{
+				StartCoroutine(ParabolikHareket(obj, PlayerControllerCold.instance.gameObject, PlayerControllerHot.instance.gameObject));
+				toplananlar.Remove(obj);
+				yield return new WaitForSeconds(.2f);
+				if (toplananlar.Count > 0) StartCoroutine(ToplananlariGonder(toplananlar[0]));
+				PlayerControllerCold.instance.toplanan = 0;
+				UiController.instance.SetEldeki2Text();
+			}
 			else
 			{
-				yield return new WaitForSeconds(.3f);
-				SetPlayerAvalibility();
+				yield return new WaitForEndOfFrame();
 			}
 		}
 		else
 		{
-			StartCoroutine(ParabolikHareket(obj, PlayerControllerHot.instance.gameObject, PlayerControllerCold.instance.gameObject));
-			toplananlar.Remove(obj);
-			yield return new WaitForSeconds(.2f);
-			if (toplananlar.Count > 0) StartCoroutine(ToplananlariGonder(toplananlar[0]));
+			if (obj.CompareTag("a5") || obj.CompareTag("a10") || obj.CompareTag("a20"))
+			{
+				StartCoroutine(ParabolikHareket(obj, PlayerControllerHot.instance.gameObject, PlayerControllerCold.instance.gameObject));
+				toplananlar.Remove(obj);
+				yield return new WaitForSeconds(.2f);
+				if (toplananlar.Count > 0) StartCoroutine(ToplananlariGonder(toplananlar[0]));
+				PlayerControllerHot.instance.toplanan = 0;
+				UiController.instance.SetEldeki1Text();
+			}
 			else
 			{
-				yield return new WaitForSeconds(.3f);
-				SetPlayerAvalibility();
+				yield return new WaitForEndOfFrame();
 			}
 		}
 	}
 
 	public IEnumerator ParabolikHareket(GameObject obj,GameObject start, GameObject end)
 	{
+		obj.transform.parent = null;
 		bool devam = true;
 		float time = 0;
 		float aci = 0;
@@ -203,17 +227,19 @@ public class GameManager : MonoBehaviour
 		{
 			if (PlayerControllerHot.instance.isAvailable)
 			{
-				int rnd = Random.Range(0, 7); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
+				int rnd = Random.Range(0, 7); // 14 oluþturma yerinin ilk 5 i buna ait olacaðý için
 				int rnd2 = Random.Range(0,3); // 6 prefabýn ilk üçü buna ait olacaðý için..
-				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
-				yield return new WaitForSeconds(1.5f);
+				GameObject obj = Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
+				obj.transform.parent = toplananlarParent;
+				yield return new WaitForSeconds(2.1f);
 			}
 			else
 			{
-				int rnd = Random.Range(7, 14); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
+				int rnd = Random.Range(7, 14); // 14 oluþturma yerinin ilk 5 i buna ait olacaðý için
 				int rnd2 = Random.Range(3, 6); // 6 prefabýn ilk üçü buna ait olacaðý için..
-				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
-				yield return new WaitForSeconds(1.5f);
+				GameObject obj = Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
+				obj.transform.parent = toplananlarParent;
+				yield return new WaitForSeconds(2.1f);
 			}
 		}
 

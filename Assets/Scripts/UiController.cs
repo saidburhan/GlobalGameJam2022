@@ -8,7 +8,7 @@ public class UiController : MonoBehaviour
 {
 
     public static UiController instance;
-    public TMP_Text gamePlayScoreText, endPanelScoreText;
+    public TMP_Text gamePlayScoreText, endPanelScoreText,eldeki1Text,eldeki2Text;
     public GameObject gamePlayPanel, endGamePanel, startPanel;
 
 
@@ -56,5 +56,14 @@ public class UiController : MonoBehaviour
         gamePlayPanel.SetActive(true);
         startPanel.SetActive(false);
         endGamePanel.SetActive(false);
+    }
+
+    public void SetEldeki1Text()
+	{
+        eldeki1Text.text = PlayerControllerHot.instance.toplanan.ToString();
+	}
+    public void SetEldeki2Text()
+    {
+        eldeki2Text.text = PlayerControllerCold.instance.toplanan.ToString();
     }
 }

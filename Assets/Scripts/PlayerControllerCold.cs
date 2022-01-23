@@ -44,7 +44,6 @@ public class PlayerControllerCold : MonoBehaviour
 			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
 			
 			characterController.Move(new Vector3(horizontalInput * speed, 0, 0) * Time.deltaTime);
-			Debug.Log(horizontalInput);
 			if (horizontalInput == 0)
 			{
 				playerAnim.ResetTrigger("run");
@@ -79,23 +78,41 @@ public class PlayerControllerCold : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("b5"))
+		if (other.CompareTag("b5") && isAvailable)
 		{
 			toplanan += 5;
+			UiController.instance.SetEldeki2Text();
 			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
+			other.transform.parent = transform;
+			other.transform.localPosition = new Vector3(0, 0.66f, -.2f);
+			other.transform.GetChild(0).gameObject.SetActive(false);
+			other.transform.GetChild(1).gameObject.SetActive(false);
+
 		}
-		else if (other.CompareTag("b10"))
+		else if (other.CompareTag("b10") && isAvailable)
 		{
 			toplanan += 10;
+			UiController.instance.SetEldeki2Text();
 			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
+			other.transform.parent = transform;
+			other.transform.localPosition = new Vector3(0, 0.66f, -.2f);
+			other.transform.GetChild(0).gameObject.SetActive(false);
+			other.transform.GetChild(1).gameObject.SetActive(false);
+
 		}
-		else if (other.CompareTag("b20"))
+		else if (other.CompareTag("b20") && isAvailable)
 		{
 			toplanan += 20;
+			UiController.instance.SetEldeki2Text();
 			GameManager.instance.toplananlar.Add(other.gameObject);
 			other.GetComponent<Collider>().enabled = false;
+			other.transform.parent = transform;
+			other.transform.localPosition = new Vector3(0, 0.66f, -.2f);
+			other.transform.GetChild(0).gameObject.SetActive(false);
+			other.transform.GetChild(1).gameObject.SetActive(false);
+
 		}
 		else if (other.CompareTag("a5"))
 		{
@@ -144,7 +161,7 @@ public class PlayerControllerCold : MonoBehaviour
 				// Oyun sonu iþlemleri...
 				GameManager.instance.GameOver();
 				isAvailable = false;
-				yield return new WaitForSeconds(3);
+				yield return new WaitForSeconds(1.5f);
 				GameManager.instance.isEndPanel = true;
 				GameManager.instance.isContinue = false;
 			}
