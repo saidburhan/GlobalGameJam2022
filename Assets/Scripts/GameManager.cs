@@ -70,8 +70,7 @@ public class GameManager : MonoBehaviour
 		UiController.instance.SetEndPanelScore();
 		PlayerControllerHot.instance.isAvailable = false;
 		PlayerControllerCold.instance.isAvailable = false;	
-		isEndPanel = true;
-		isContinue = false;
+		
 	}
 
 	public void GameStartEvents()
@@ -91,12 +90,14 @@ public class GameManager : MonoBehaviour
 		PlayerControllerHot.instance.PlayerHotStartingEvent();
 		PlayerControllerCold.instance.transform.position = new Vector3(4,-4.9F,-.5F);
 		PlayerControllerHot.instance.transform.position = new Vector3(-4,-4.9F,-.5F);
-		
+		PlayerControllerCold.instance.isAvailable = false;
+		AllIdleAnim();
 	}
 
 
 	public void StartingEvents()
 	{
+		AllIdleAnim();
 		score = 0;
 		for (int i = 0; i < toplananlar.Count; i++)
 		{
@@ -165,6 +166,7 @@ public class GameManager : MonoBehaviour
 		{
 			PlayerControllerCold.instance.isAvailable = false;
 			PlayerControllerHot.instance.isAvailable = true;
+			AllIdleAnim();
 			StartCoroutine(PlayerControllerHot.instance.SliderActive());
 
 		}
@@ -172,8 +174,27 @@ public class GameManager : MonoBehaviour
 		{
 			PlayerControllerHot.instance.isAvailable = false;
 			PlayerControllerCold.instance.isAvailable = true;
+			AllIdleAnim();
 			StartCoroutine(PlayerControllerCold.instance.SliderActive());
 		}
+
+	}
+
+	public void ResetAllAnim()
+	{
+		PlayerControllerCold.instance.playerAnim.ResetTrigger("run");
+		PlayerControllerCold.instance.playerAnim.ResetTrigger("idle");
+		PlayerControllerHot.instance.playerAnim.ResetTrigger("run");
+		PlayerControllerHot.instance.playerAnim.ResetTrigger("idle");
+	}
+
+
+	public void AllIdleAnim()
+	{
+		PlayerControllerCold.instance.playerAnim.ResetTrigger("run");
+		PlayerControllerCold.instance.playerAnim.SetTrigger("idle");
+		PlayerControllerHot.instance.playerAnim.ResetTrigger("run");
+		PlayerControllerHot.instance.playerAnim.SetTrigger("idle");
 	}
 
 	public IEnumerator CreateFireOrIce()
@@ -185,16 +206,18 @@ public class GameManager : MonoBehaviour
 				int rnd = Random.Range(0, 7); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
 				int rnd2 = Random.Range(0,3); // 6 prefabýn ilk üçü buna ait olacaðý için..
 				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
-				yield return new WaitForSeconds(2);
+				yield return new WaitForSeconds(1.5f);
 			}
 			else
 			{
 				int rnd = Random.Range(7, 14); // 10 oluþturma yerinin ilk 5 i buna ait olacaðý için
 				int rnd2 = Random.Range(3, 6); // 6 prefabýn ilk üçü buna ait olacaðý için..
 				Instantiate(toplananPrefablar[rnd2], olusturmaPozisyonlari[rnd], Quaternion.identity);
-				yield return new WaitForSeconds(2);
+				yield return new WaitForSeconds(1.5f);
 			}
 		}
+
+	
 	}
 
 }

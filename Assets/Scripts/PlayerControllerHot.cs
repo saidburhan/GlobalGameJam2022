@@ -18,6 +18,7 @@ public class PlayerControllerHot : MonoBehaviour
 	public Slider slider;
 	public int toplanan;
 	public GameObject playerModel;
+	public Animator playerAnim;
 
 	private void Awake()
 	{
@@ -32,22 +33,25 @@ public class PlayerControllerHot : MonoBehaviour
 
 	private void Update()
 	{
+		isGrounded = Physics.CheckSphere(transform.position, .2f, groundLayers, QueryTriggerInteraction.Ignore);
 		if (isAvailable)
 		{
 			horizontalInput = Input.GetAxis("Horizontal"); ;
 
 			// face forward
-			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);
+			playerModel.transform.forward = new Vector3(horizontalInput, 0, Mathf.Abs(horizontalInput) - 1);		
 
-			isGrounded = Physics.CheckSphere(transform.position, .2f, groundLayers, QueryTriggerInteraction.Ignore);
-
-			if (isGrounded && velocity.y < 0)
+			Debug.Log(horizontalInput);
+			if (horizontalInput == 0)
 			{
-				velocity.y = 0;
+				playerAnim.ResetTrigger("run");
+				playerAnim.SetTrigger("idle");
+
 			}
 			else
 			{
-				velocity.y += gravity * Time.deltaTime;
+				playerAnim.ResetTrigger("idle");
+				playerAnim.SetTrigger("run");
 			}
 
 			characterController.Move(new Vector3(horizontalInput * speed, 0, 0) * Time.deltaTime);
@@ -58,9 +62,17 @@ public class PlayerControllerHot : MonoBehaviour
 					velocity.y += Mathf.Sqrt(jumpHeight * -2 * gravity);
 			}
 
-			characterController.Move(velocity * Time.deltaTime);
+			
 		}
-		
+		if (isGrounded && velocity.y < 0)
+		{
+			velocity.y = 0;
+		}
+		else
+		{
+			velocity.y += gravity * Time.deltaTime;
+		}
+		characterController.Move(velocity * Time.deltaTime);
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -135,6 +147,9 @@ public class PlayerControllerHot : MonoBehaviour
 				// Oyun sonu iþlemleri...
 				GameManager.instance.GameOver();
 				isAvailable = false;
+				yield return new WaitForSeconds(3);
+				GameManager.instance.isEndPanel = true;
+				GameManager.instance.isContinue = false;
 			}
 		}
 	}
